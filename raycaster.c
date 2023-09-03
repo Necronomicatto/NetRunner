@@ -11,21 +11,21 @@ void drawPlayer(){
     glVertex2i(px,py);
     glEnd();
 }
-/*
-int mapX=8,mapY=8,mapS=64;
+
+int mapX=8, mapY=8, mapS=64;
 int map[]={
     1,1,1,1,1,1,1,1,
-    1,0,1,0,0,0,0,1,
     1,0,0,0,0,0,0,1,
-    1,0,0,0,1,0,0,1,
-    1,0,0,0,0,1,0,1,
-    1,0,1,0,0,0,0,1,
+    1,0,1,0,0,0,1,1,
+    1,0,1,1,0,0,1,1,
     1,0,0,0,0,0,0,1,
-    1,1,1,1,1,1,1,1
+    1,0,0,1,0,0,0,1,
+    1,0,0,0,0,0,0,1,
+    1,1,1,1,1,1,1,1,
 };
 
 void drawMap2D(){
-    int x,y,Xo,Yo;
+    int x,y,xo,yo;
     for(y=0; y<mapY; y++){
         for(x=0; x<mapX; x++){
             if(map[y*mapX+x]==1){
@@ -34,23 +34,23 @@ void drawMap2D(){
                 glColor3f(0,0,0);
             }
 
-            Xo=x*mapS;
-            Yo=y*mapS;
+            xo=x*mapS;
+            yo=y*mapS;
 
             glBegin(GL_QUADS);
-            glVertex2i(Xo+1, Yo+1);
-            glVertex2i(Xo+1, Yo+mapS-1);
-            glVertex2i(Xo+mapS-1, Yo+mapS-1);
-            glVertex2i(Xo+mapS-1, Yo+1);
+            glVertex2i(xo, yo);
+            glVertex2i(xo, yo+mapS);
+            glVertex2i(xo+mapS, yo+mapS);
+            glVertex2i(xo+mapS, yo);
             glEnd();
         }
     }
 }
-*/
+
 void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //drawMap2D;
-    drawPlayer;
+    drawMap2D();
+    drawPlayer();
     glutSwapBuffers();
 }
 
@@ -74,6 +74,7 @@ void buttons(unsigned char key, int x, int y){
 void init(){
     glClearColor(0.3,0.3,0.3,0);
     gluOrtho2D(0,1024,512,0);
+
     px=300;
     py=300;
 }
@@ -82,7 +83,7 @@ int main(int argc, char* argv[]){
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(1024, 512);
-    glutCreateWindow("NetRunnerAlpha");
+    glutCreateWindow("NetRunner Alpha");
     init();
     glutDisplayFunc(display);
     glutKeyboardFunc(buttons);
