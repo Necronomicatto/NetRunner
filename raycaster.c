@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <GL/glut.h>
 #include <math.h>
+
 #define PI 3.1415926535
+#define P2 PI/2
+#define P3 3*PI/2
 
 
 float px, py, pdx, pdy, pa;
@@ -56,11 +59,17 @@ void drawMap2D(){
     }
 }
 
+float distance(float ax, float ay, float bx, float by, float ang){
+    return (sqrt((bx-ax)*(bx-ax)+(by-ay)*(by-ay)));
+}
+
 void drawRays2D(){
     int r, mx, my, mp, dof;
     float rx, ry, ra, xo, yo;
+    ra=pa;
 
     for(r=0; r<1; r++){
+        float disH=1000000,hx=px,hy=py;
         dof=0;
         float aTan=-1/tan(ra);
         if(ra>PI){        //looking up
@@ -86,7 +95,10 @@ void drawRays2D(){
             my=(int)(ry)>>6;
             mp=my*mapX+mx;
 
-            if(mp<mapX*mapY && map[mp]==1){       //hit wall
+            if(mp>0 && mp<mapX*mapY && map[mp]==1){ 
+                hx=rx;
+                hy=ry;
+                disH=distance(px, py, hx, hy, ra);    //hit wall
                 dof=8;
             } else {                              //next line
                 rx+=xo;
@@ -95,7 +107,53 @@ void drawRays2D(){
             }            
         }
 
-        glColor3f(0,1,0);
+        dof=0;
+        float disV=1000000,vx=px,vy=py;
+        float nTan=-tan(ra);
+        if(ra>P2 && ra<P3){        //looking left
+            rx=(((int)px>>6)<<6)-0.0001;
+            ry=(px-rx)*nTan+py;
+            xo=-64;
+            yo=-xo*nTan;
+        }
+        if(ra<P2 || ra>P3){        //looking right
+            rx=(((int)px>>6)<<6)+64;
+            ry=(px-rx)*nTan+py;
+            xo=64;
+            yo=-xo*nTan;
+        }
+        if(ra==0 || ra==PI){     //looking up or down
+            rx=px;
+            ry=py;
+            dof=8;
+        }
+
+        while(dof<8){
+            mx=(int)(rx)>>6;
+            my=(int)(ry)>>6;
+            mp=my*mapX+mx;
+
+            if(mp>0 && mp<mapX*mapY && map[mp]==1){ 
+                vx=rx;
+                vy=ry;
+                disV=distance(px, py, vx, vy, ra);      //hit wall
+                dof=8;
+            } else {                              //next line
+                rx+=xo;
+                ry+=yo;
+                dof+=1;
+            }            
+        }
+
+        if(disV<disH){
+            rx=vx;
+            ry=vy;
+        }
+        if(disV>disH){
+            rx=hx;
+            ry=hy;
+        }
+        glColor3f(1,0,0);
         glLineWidth(1);
         glBegin(GL_LINES);
         glVertex2i(px, py);
